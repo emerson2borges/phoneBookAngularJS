@@ -1,0 +1,115 @@
+<html ng-app="listaTelefonica">
+
+    <head>
+        <title>Lista Telefônica</title>
+        <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.css">
+        <style>
+            .jumbotron {
+                width:400px;
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 20px;
+            }
+            .table {
+                margin-top:20px;
+            }
+            .form-control {
+                margin-bottom: 5px;
+            }
+            .selecionado {
+                background-color: yellow;
+            }
+            .negrito {
+                font-weight: bold;
+            }
+        </style>
+        <script src="lib/angular/angular.js"></script>
+        <script>
+
+            angular.module("listaTelefonica", []);
+            angular.module("listaTelefonica").controller("listaTelefonicaCtrl", function ($scope) {
+
+                $scope.app = "Lista Telefonica";
+
+                $scope.operadoras = [
+                    {nome: "Claro", codigo: 21, categoria: "Celular"},
+                    {nome: "Oi", codigo: 31, categoria: "Celular"},
+                    {nome: "Tim", codigo: 21, categoria: "Celular"},
+                    {nome: "Vivo", codigo: 15, categoria: "Celular"},
+                    {nome: "Brisanet", codigo: 00, categoria: "Fixo"},
+                    {nome: "Embratel", codigo: 99, categoria: "Fixo"    }
+                ]
+
+                $scope.contatos = [
+                    {nome: "Ana", telefone: "33221100", operadora: "", cor: "red"},
+                    {nome: "Bruna", telefone: "33221111", operadora: "", cor: "blue"},
+                    {nome: "Carlos", telefone: "33221122", operadora: "", cor: "orange"},
+                ]
+
+                $scope.adicionarContato = function(contato) {
+                    $scope.contatos.push(angular.copy(contato))
+                    delete $scope.contato;
+                }
+
+                $scope.apagarContatos = function(contatos) {
+                    $scope.contatos = contatos.filter(function(contato) {
+                        if (!contato.selecionado) {
+                            return contato
+                        }
+                    });
+                }
+
+                $scope.isContatoSelecionado = function(contatos) {
+                    return contatos.some(function(contato) {
+                        return contato.selecionado;
+                    });
+                }
+            });
+        </script>
+    </head>
+
+    <body ng-controller="listaTelefonicaCtrl">
+        <div class="jumbotron">
+            <h4>{{app}}</h4>
+            <table ng-show="contatos.length > 0" class="table table-striped">
+                <tr>
+                    <th></th>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Operadora</th>
+                    <th></th>
+                </tr>
+                <tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos">
+                    <td><input type="checkbox" ng-model="contato.selecionado" /></td>
+                    <td>{{contato.nome}}</td>
+                    <td>{{contato.telefone}}</td>
+                    <td>{{contato.operadora.nome}}</td>
+                    <td><div style="width: 20px; height: 20px;" ng-style="{'background-color': contato.cor}"></div></td>
+                </tr>
+            </table>
+            <input class="form-control" type="text" ng-model="contato.nome" placeholder="Nome"/>
+            <input class="form-control" type="text" ng-model="contato.telefone" placeholder="Fone"/>
+            <select 
+                class="form-control" 
+                ng-model="contato.operadora" 
+                ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
+                    <option value="">Seleciona uma operadora...</option>
+            </select>
+            <button 
+                class="btn btn-primary btn-block"
+                ng-click="adicionarContato(contato)"
+                ng-disabled="!contato.nome || !contato.telefone || !contato.operadora"
+            >Adicionar</button>
+            <button 
+                class="btn btn-danger btn-block"
+                ng-click="apagarContatos(contatos)"
+                ng-if="isContatoSelecionado(contatos)"
+            >Apagar Contatos</button>
+
+            <div ng-include="'footer.html'"></div>
+
+        </div>
+    </body>
+
+</html>
